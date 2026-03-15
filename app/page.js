@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div style={{background:"#0a0a0a",color:"white",minHeight:"100vh",padding:"60px",fontFamily:"Arial"}}>
-      <h1 style={{fontSize:"48px"}}>AI Promo Video Generator</h1>
+      <h1 style={{fontSize:"48px"}}>Speng Music Promo Generator</h1>
       <p style={{fontSize:"20px",marginTop:"20px"}}>
         Turn your song into promo videos for Instagram, YouTube Shorts and Spotify Canvas.
       </p>
