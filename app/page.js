@@ -7,6 +7,8 @@ export default function Home() {
   const [songName, setSongName] = useState("");
   const [prompt, setPrompt] = useState("");
   const [message, setMessage] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [resultReady, setResultReady] = useState(false);
 
   function handleImageUpload(event) {
     const file = event.target.files && event.target.files[0];
@@ -14,6 +16,8 @@ export default function Home() {
 
     const imageUrl = URL.createObjectURL(file);
     setImage(imageUrl);
+    setResultReady(false);
+    setMessage("");
   }
 
   function handleSongUpload(event) {
@@ -21,6 +25,8 @@ export default function Home() {
     if (!file) return;
 
     setSongName(file.name);
+    setResultReady(false);
+    setMessage("");
   }
 
   function handleGenerate() {
@@ -39,9 +45,15 @@ export default function Home() {
       return;
     }
 
-    setMessage(
-      `Generating promo video for "${songName}" with prompt: "${prompt}"`
-    );
+    setMessage("");
+    setIsGenerating(true);
+    setResultReady(false);
+
+    setTimeout(() => {
+      setIsGenerating(false);
+      setResultReady(true);
+      setMessage("Promo video concept generated successfully.");
+    }, 2500);
   }
 
   return (
@@ -159,6 +171,7 @@ export default function Home() {
       <div style={{ marginTop: "30px" }}>
         <button
           onClick={handleGenerate}
+          disabled={isGenerating}
           style={{
             background: "white",
             color: "black",
@@ -166,11 +179,12 @@ export default function Home() {
             borderRadius: "10px",
             fontSize: "16px",
             border: "none",
-            cursor: "pointer",
+            cursor: isGenerating ? "not-allowed" : "pointer",
             fontWeight: "bold",
+            opacity: isGenerating ? 0.7 : 1,
           }}
         >
-          Generate Promo Video
+          {isGenerating ? "Generating..." : "Generate Promo Video"}
         </button>
       </div>
 
@@ -186,6 +200,58 @@ export default function Home() {
           }}
         >
           {message}
+        </div>
+      ) : null}
+
+      {resultReady ? (
+        <div
+          style={{
+            marginTop: "40px",
+            maxWidth: "850px",
+            background: "#111",
+            border: "1px solid #333",
+            borderRadius: "14px",
+            padding: "24px",
+          }}
+        >
+          <h2 style={{ marginBottom: "15px" }}>Generated Promo Concept</h2>
+          <p style={{ marginBottom: "10px" }}>
+            <strong>Track:</strong> {songName}
+          </p>
+          <p style={{ marginBottom: "10px" }}>
+            <strong>Style Prompt:</strong> {prompt}
+          </p>
+          <p style={{ marginBottom: "20px" }}>
+            <strong>Status:</strong> Draft promo storyboard ready
+          </p>
+
+          <div
+            style={{
+              background: "#1d1d1d",
+              border: "1px dashed #555",
+              borderRadius: "12px",
+              padding: "40px",
+              textAlign: "center",
+              color: "#bbb",
+            }}
+          >
+            Video preview area coming next
+          </div>
+
+          <button
+            style={{
+              marginTop: "20px",
+              background: "white",
+              color: "black",
+              padding: "12px 24px",
+              borderRadius: "10px",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+          >
+            Download Preview
+          </button>
         </div>
       ) : null}
     </main>
