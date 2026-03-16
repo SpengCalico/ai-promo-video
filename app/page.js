@@ -6,6 +6,7 @@ export default function Home() {
   const [image, setImage] = useState(null);
   const [songName, setSongName] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [outputType, setOutputType] = useState("promo");
   const [message, setMessage] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [scenes, setScenes] = useState([]);
@@ -58,14 +59,20 @@ export default function Home() {
         body: JSON.stringify({
           songName,
           prompt,
+          outputType,
         }),
       });
 
       const data = await res.json();
 
+      if (!res.ok || !data.success) {
+        setMessage(data.error || "Image generation failed.");
+        return;
+      }
+
       const updatedScenes = (data.scenes || []).map((scene) => ({
         ...scene,
-        image: image,
+        image: scene.image || image,
       }));
 
       setScenes(updatedScenes);
@@ -94,6 +101,7 @@ export default function Home() {
     const exportData = {
       songName,
       prompt,
+      outputType,
       scenes,
     };
 
@@ -157,8 +165,7 @@ export default function Home() {
             }}
           >
             Upload an artist image, add a song, write a promo prompt, and
-            generate a visual storyboard for Instagram Reels, YouTube Shorts,
-            and Spotify Canvas campaigns.
+            generate a visual storyboard for promo video, Spotify Canvas, or both.
           </p>
         </div>
 
@@ -293,6 +300,29 @@ export default function Home() {
               />
             </div>
 
+            <div style={{ marginBottom: "24px" }}>
+              <h3 style={{ marginBottom: "12px", fontSize: "18px" }}>
+                Output Type
+              </h3>
+              <select
+                value={outputType}
+                onChange={(e) => setOutputType(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "14px",
+                  borderRadius: "10px",
+                  border: "1px solid #333",
+                  background: "#0b0b0b",
+                  color: "white",
+                  fontSize: "15px",
+                }}
+              >
+                <option value="promo">Promo Video</option>
+                <option value="canvas">Spotify Canvas</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+
             <div
               style={{
                 display: "flex",
@@ -375,7 +405,7 @@ export default function Home() {
                     Storyboard
                   </h2>
                   <p style={{ color: "#bdbdbd", margin: 0 }}>
-                    Edit the scenes before you move to image or video generation.
+                    Output type: <strong>{outputType}</strong>
                   </p>
                 </div>
 
