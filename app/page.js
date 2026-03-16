@@ -220,7 +220,7 @@ export default function Home() {
       ) : null}
 
       {scenes.length > 0 && (
-        <div style={{ marginTop: "40px", maxWidth: "850px" }}>
+        <div style={{ marginTop: "40px", maxWidth: "1000px" }}>
           <h2 style={{ marginBottom: "20px" }}>Storyboard</h2>
 
           {scenes.map((scene) => (
@@ -228,15 +228,28 @@ export default function Home() {
               key={scene.scene}
               style={{
                 background: "#111",
-                padding: "20px",
-                marginTop: "15px",
-                borderRadius: "10px",
+                marginTop: "20px",
+                borderRadius: "14px",
                 border: "1px solid #333",
+                overflow: "hidden",
               }}
             >
-              <h3 style={{ marginBottom: "10px" }}>Scene {scene.scene}</h3>
-              <p style={{ marginBottom: "10px" }}>{scene.description}</p>
-              <p style={{ color: "#aaa" }}>{scene.text}</p>
+              <img
+                src={scene.image}
+                alt={`Scene ${scene.scene}`}
+                style={{
+                  width: "100%",
+                  height: "260px",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+
+              <div style={{ padding: "20px" }}>
+                <h3 style={{ marginBottom: "10px" }}>Scene {scene.scene}</h3>
+                <p style={{ marginBottom: "10px" }}>{scene.description}</p>
+                <p style={{ color: "#aaa" }}>{scene.text}</p>
+              </div>
             </div>
           ))}
         </div>
