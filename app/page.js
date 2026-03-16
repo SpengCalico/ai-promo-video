@@ -8,7 +8,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [message, setMessage] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [resultReady, setResultReady] = useState(false);
+  const [scenes, setScenes] = useState([]);
 
   function handleImageUpload(event) {
     const file = event.target.files && event.target.files[0];
@@ -16,8 +16,8 @@ export default function Home() {
 
     const imageUrl = URL.createObjectURL(file);
     setImage(imageUrl);
-    setResultReady(false);
     setMessage("");
+    setScenes([]);
   }
 
   function handleSongUpload(event) {
@@ -25,11 +25,11 @@ export default function Home() {
     if (!file) return;
 
     setSongName(file.name);
-    setResultReady(false);
     setMessage("");
+    setScenes([]);
   }
 
-  function handleGenerate() {
+  async function handleGenerate() {
     if (!image) {
       setMessage("Please upload an artist photo first.");
       return;
@@ -47,13 +47,29 @@ export default function Home() {
 
     setMessage("");
     setIsGenerating(true);
-    setResultReady(false);
+    setScenes([]);
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          songName,
+          prompt,
+        }),
+      });
+
+      const data = await res.json();
+
+      setScenes(data.scenes || []);
+      setMessage("Storyboard generated successfully!");
+    } catch (error) {
+      setMessage("Something went wrong while generating the storyboard.");
+    } finally {
       setIsGenerating(false);
-      setResultReady(true);
-      setMessage("Promo video concept generated successfully.");
-    }, 2500);
+    }
   }
 
   return (
@@ -203,57 +219,28 @@ export default function Home() {
         </div>
       ) : null}
 
-      {resultReady ? (
-        <div
-          style={{
-            marginTop: "40px",
-            maxWidth: "850px",
-            background: "#111",
-            border: "1px solid #333",
-            borderRadius: "14px",
-            padding: "24px",
-          }}
-        >
-          <h2 style={{ marginBottom: "15px" }}>Generated Promo Concept</h2>
-          <p style={{ marginBottom: "10px" }}>
-            <strong>Track:</strong> {songName}
-          </p>
-          <p style={{ marginBottom: "10px" }}>
-            <strong>Style Prompt:</strong> {prompt}
-          </p>
-          <p style={{ marginBottom: "20px" }}>
-            <strong>Status:</strong> Draft promo storyboard ready
-          </p>
+      {scenes.length > 0 && (
+        <div style={{ marginTop: "40px", maxWidth: "850px" }}>
+          <h2 style={{ marginBottom: "20px" }}>Storyboard</h2>
 
-          <div
-            style={{
-              background: "#1d1d1d",
-              border: "1px dashed #555",
-              borderRadius: "12px",
-              padding: "40px",
-              textAlign: "center",
-              color: "#bbb",
-            }}
-          >
-            Video preview area coming next
-          </div>
-
-          <button
-            style={{
-              marginTop: "20px",
-              background: "white",
-              color: "black",
-              padding: "12px 24px",
-              borderRadius: "10px",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
-          >
-            Download Preview
-          </button>
+          {scenes.map((scene) => (
+            <div
+              key={scene.scene}
+              style={{
+                background: "#111",
+                padding: "20px",
+                marginTop: "15px",
+                borderRadius: "10px",
+                border: "1px solid #333",
+              }}
+            >
+              <h3 style={{ marginBottom: "10px" }}>Scene {scene.scene}</h3>
+              <p style={{ marginBottom: "10px" }}>{scene.description}</p>
+              <p style={{ color: "#aaa" }}>{scene.text}</p>
+            </div>
+          ))}
         </div>
-      ) : null}
+      )}
     </main>
   );
 }
